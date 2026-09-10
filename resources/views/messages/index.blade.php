@@ -1,32 +1,51 @@
 @extends('layouts.layout')
-@section('title', 'Users')
+@section('title', 'Messages')
 @section('content')
-    @if (Auth::user())
-        <h1 style="color: blue;">نام شما: {{ Auth::user()->name }}</h1>
-    @endif
-    <main style="display: flex; width: 100vw;" class="flex-col text-3xl">
-            @foreach ($messages as $message)
-            @if ($message->user != Auth::user())
-            <div class="flex flex-col self-start gap-4">
-                <h2>{{$message->content }}</h2>
-                @if ($message->image)
-                <img src="{{ asset('images/'. $message->image) }}" alt="" class="w-40">
-                @endif
-            </div>
+
+    @auth
+        <h1 class="text-blue-600 text-2xl font-bold mb-4">نام شما: {{ auth()->user()->name }}</h1>
+    @endauth
+
+    <main class="flex flex-col gap-3 max-w-2xl mx-auto p-4">
+
+        @foreach ($messages as $message)
+
+            @if ($message->user_id === auth()->id())
+                {{-- YOUR message --}}
+                <div class="self-end bg-blue-500 text-white p-3 rounded-lg max-w-xs shadow">
+                    <p class="font-bold">{{ $message->content }}</p>
+                    @if ($message->image)
+                        <img src="{{ asset('images/' . $message->image) }}" alt="" class="w-32 rounded mt-2">
+                    @endif
+                    <span class="text-xs text-blue-200 block mt-1 text-right">
+                        {{ $message->created_at->format('H:i') }}
+                    </span>
+                </div>
             @else
-            <div class="flex flex-col self-end gap-4">
-                <h2 class="font-black">{{$message->content }}</h2>
-            @if ($message->image)
-                <img src="{{ asset('images/'. $message->image) }}" alt="" class="w-40">
+                {{-- THEIR message --}}
+                <div class="self-start bg-gray-200 text-gray-900 p-3 rounded-lg max-w-xs shadow">
+                    <p class="text-xs font-bold text-gray-500 mb-1">{{ $message->user->name }}</p>
+                    <p>{{ $message->content }}</p>
+                    @if ($message->image)
+                        <img src="{{ asset('images/' . $message->image) }}" alt="" class="w-32 rounded mt-2">
+                    @endif
+                    <span class="text-xs text-gray-400 block mt-1">
+                        {{ $message->created_at->format('H:i') }}
+                    </span>
+                </div>
             @endif
-            @endif
-            @endforeach
-        </main>
-    <h1>ساخت حساب کاربری</h1>
-    <form action="{{ route('create_message') }}" method="post" enctype="multipart/form-data">
+
+        @endforeach
+
+    </main>
+
+    <form action="{{ route('create_message') }}" method="post" enctype="multipart/form-data"
+          class="max-w-2xl mx-auto p-4 flex gap-2">
         @csrf
-        <input type="text" placeholder="Enter message" name="content">
-        <input type="file" name="image" id="image">
-        <button>ارسال</button>
+        <input type="text" name="content" placeholder="پیام خود را بنویسید..."
+               class="flex-1 p-2 border rounded">
+        <input type="file" name="image" id="image" class="p-2">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">ارسال</button>
     </form>
+
 @endsection
