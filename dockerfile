@@ -1,5 +1,6 @@
 FROM php:8.4-apache
-
+# FORCE IPv4 to prevent "Network is unreachable" IPv6 errors on Render
+RUN echo "precedence ::ffff:0:0/96 100" >> /etc/gai.conf
 # Install system dependencies and PHP extensions (including PostgreSQL)
 RUN apt-get update && apt-get install -y \
     git curl libpng-dev libonig-dev libxml2-dev zip unzip libzip-dev libpq-dev \
