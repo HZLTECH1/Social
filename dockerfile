@@ -28,8 +28,9 @@ COPY . .
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 # Fix permissions for Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
+# Create the images folder and give Apache (www-data) permission to write to it
+RUN mkdir -p /var/www/html/public/images
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/images
 # Copy startup script
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
